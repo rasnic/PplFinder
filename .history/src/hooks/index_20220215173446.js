@@ -1,0 +1,1 @@
+export { usePeopleFetch , useC} from "./usePeopleFetch";
