@@ -4,6 +4,8 @@ import { Home, Favorites } from "pages";
 import { ThemeProvider } from "theme";
 import NavBar from "components/NavBar";
 
+
+
 const AppRouter = () => {
   return (
     <ThemeProvider>

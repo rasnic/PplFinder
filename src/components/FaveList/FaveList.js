@@ -1,25 +1,32 @@
 import React, { useEffect, useState } from "react";
 import Text from "components/Text";
 import Spinner from "components/Spinner";
-import CheckBox from "components/CheckBox";
 import IconButton from "@material-ui/core/IconButton";
 import FavoriteIcon from "@material-ui/icons/Favorite";
 import * as S from "./style";
 
-let usersByCountry = JSON.parse(localStorage.getItem("usersByCountry"));
 
-const UserList = ({ users, isLoading, countries ,favorites}) => {
+const FaveList = ({ users, isLoading, favorites}) => {
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [hoveredUserId, setHoveredUserId] = useState();
-  const [countryFilter, setCountryFilter] = useState([]);
   
-
   useEffect(() => {
+    let tempUsers = [];
     function getUsers(){
-      setFilteredUsers(users);
+      if(users && favorites){
+    for (let index = 0; index < favorites.length; index++) {
+          for (let j = 0; j < users.length; j++) {
+            if(favorites[index] === users[j].email){
+              tempUsers.push(users[j]);
+              j = 0
+              break
+            }
+          }
+          }
+      setFilteredUsers(tempUsers);}
    }
    getUsers()
-  }, [users]);
+  }, [favorites,users]);
 
   const handleMouseEnter = (index) => {
     setHoveredUserId(index);
@@ -31,56 +38,17 @@ const UserList = ({ users, isLoading, countries ,favorites}) => {
   
   function isFavorite(user) {
     let index = favorites.indexOf(user.email);
-    if( index > -1){
-      favorites.splice(index, 1);
-    } else{
-      favorites.push(user.email);
-    }
-    localStorage.setItem("favorites", JSON.stringify(favorites));
+    let tempUsers = filteredUsers;
+    tempUsers.splice(index,1)
+    favorites.splice(index,1)
+    localStorage.setItem("favorites", JSON.stringify(favorites))
+    setFilteredUsers(tempUsers)
   }
   
-  
-   function filterCheck(country) {
-    let tempCF = countryFilter;
-    let index = countryFilter.indexOf(country);
-    if (index > -1) {
-       tempCF.splice(index,1)
-       setCountryFilter(tempCF);
-    } else {
-      tempCF.push(country)
-       setCountryFilter(tempCF);
-    }
-    if (countryFilter.length === 0){
-       setFilteredUsers(users);
-    } else{
-      let tempUsers = [];
-      tempCF.forEach(c => {
-        usersByCountry[c].forEach(user =>{
-          tempUsers.push(user)
-        })
-      });
-      setFilteredUsers(tempUsers);
-    }
-  }
     
   return (
-    <S.UserList>
-      <S.Filters>
-        <div style={{maxWidth : 500, display: "flex", flexWrap: "wrap"}}>
-        {countries.map((country) =>{
-          return(
-          <CheckBox 
-          style={{flex: 1}}
-          key={country}
-          value={country}
-          label={country} 
-          onChange={()=>filterCheck(country)}
-          />
-          )
-        })}
-        </div>
-      </S.Filters>
-      
+    <S.FaveList>
+     
       <S.List>
         {filteredUsers.map((user, index) => {
           return (
@@ -119,8 +87,8 @@ const UserList = ({ users, isLoading, countries ,favorites}) => {
           </S.SpinnerWrapper>
         )}
       </S.List>
-    </S.UserList>
+    </S.FaveList>
   );
 };
 
-export default UserList;
+export default FaveList;
